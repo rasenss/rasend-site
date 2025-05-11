@@ -1,0 +1,363 @@
+@import "tailwindcss";
+
+/* Portfolio aspect ratio classes */
+.portfolio-image-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  transition: padding-bottom 0.25s ease;
+  min-height: 160px; /* Reduced minimum height */
+}
+
+.portfolio-image {
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Ensure images in grid maintain consistent appearance */
+.portfolio-grid .portfolio-image-container {
+  min-height: 180px; /* Reduced minimum height */
+  max-height: 220px; /* Added maximum height */
+}
+
+/* Ensure modal images have enough space but not too much */
+.modal-content .portfolio-image-container {
+  min-height: 180px;
+  max-height: 300px;
+}
+
+/* Custom base s  .contact-highlight {
+    animation: highlight-section 1.5s ease-in-out;
+    position: relative;
+  }
+  
+  .contact-highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    animation: highlight-focus 1.5s ease-in-out;
+    outline: 0px solid transparent;
+    outline-offset: 2px;
+    border-radius: 8px;
+  }es */
+@layer base {
+  /* Enhanced scrolling behavior */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+  }
+
+  /* Ensure proper scrolling with fixed navbar */
+  section[id] {
+    scroll-margin-top: 6rem; /* Adjust to match navbar height plus buffer */
+    scroll-behavior: smooth;
+  }
+  
+  /* Special margin for contact section to prevent footer overlap - with higher specificity */
+  section#contact, 
+  section[id="contact"], 
+  section[data-section-id="contact"] {
+    scroll-margin-top: 8rem !important;
+    position: relative;
+    z-index: 10; /* Ensure contact sits above other content */
+    isolation: isolate; /* Create stacking context to prevent bleed-through */
+  }
+  
+  /* Fixed positioning for contact anchor to improve navigation reliability */
+  #contact-anchor {
+    position: absolute;
+    height: 1px;
+    width: 100%;
+    pointer-events: none;
+    visibility: hidden;
+    z-index: -1;
+  }
+  
+  /* Simplified animation for contact section highlight */
+  @keyframes highlight-section {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    30% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.5); }
+    70% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  }
+  
+  /* Simplified implementation for better performance and fewer visual glitches */
+  .contact-highlight {
+    animation: highlight-section 1.5s ease-in-out;
+    position: relative;
+    z-index: 10;
+    outline: none;
+  }
+  
+  :root {
+    --scrollbar-thumb: #333333;
+    --scrollbar-track: #121212;
+    --background-primary: #050810;
+    --background-secondary: #0a0e1a;
+    --text-primary: #ffffff;
+    --text-secondary: #a9b3cc;
+    --accent-primary: #6366f1;
+    --accent-secondary: #4338ca;
+    --card-bg: #0d1320;
+    --card-border: rgba(75, 85, 99, 0.5);
+    
+    /* Additional theme variables */
+    --hero-bg-start: #050c1a;
+    --hero-bg-end: #0a192f;
+    --nav-bg: rgba(17, 24, 39, 0.8);
+    --input-bg: #1f2937;
+    --input-border: #4b5563;
+    --shadow-color: rgba(59, 130, 246, 0.3);
+    --gradient-start: #3b82f6;
+    --gradient-end: #2563eb;
+    --card-hover: #1e293b;
+    --button-text: #ffffff;
+    --button-hover: #2563eb;
+    --button-active: #1d4ed8;
+  }
+
+  /* Smooth scroll */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  
+  /* Responsive Typography */
+  html {
+    font-size: 14px;
+  }
+  
+  @media (min-width: 640px) {
+    html {
+      font-size: 15px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  
+  /* Responsive container padding */
+  .container-responsive {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .container-responsive {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+      max-width: 1024px;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .container-responsive {
+      max-width: 1280px;
+    }
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+    border: 2px solid var(--scrollbar-track);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+
+  /* Selection styles */
+  ::selection {
+    background: #2563eb;
+    color: #ffffff;
+  }
+
+  /* Theme-based button styling */
+  button, .button {
+    color: var(--button-text);
+    background-color: var(--accent-primary);
+    transition: all 0.2s ease;
+  }
+
+  button:hover, .button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+  }
+
+  button:active, .button:active {
+    background-color: var(--button-active);
+    transform: translateY(0);
+  }
+
+  /* Ensure proper scrolling with fixed navbar */
+  section[id] {
+    scroll-margin-top: 6rem; /* Adjust to match navbar height plus some buffer */
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  /* Responsive text truncation */
+  .text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Better image rendering */
+  .pixelated {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+  }
+
+  .gradient-border {
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(45deg, #8b5cf6, #3b82f6);
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+  }
+
+  /* Theme-aware gradient border */
+  .theme-border {
+    position: relative;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+  }
+
+  /* Running text animation */
+  @keyframes running-text {
+    0% {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-text {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .animate-running-text {
+    animation: running-text 0.8s forwards;
+  }
+
+  /* Hero section gradients */
+  .hero-gradient {
+    background: linear-gradient(to right, var(--hero-bg-start), var(--hero-bg-end));
+  }
+  
+  /* Blue glow effect */
+  .blue-glow {
+    box-shadow: 0 0 25px rgba(37, 99, 235, 0.5);
+  }
+
+  .theme-glow {
+    box-shadow: 0 0 25px var(--shadow-color);
+  }
+
+  /* Social button hover effect */
+  .social-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .social-hover:hover {
+    color: var(--accent-primary);
+    transform: translateY(-3px);
+  }
+
+  /* Typewriter cursor blinking animation */
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+  
+  .animate-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Additional animations for the hero section */
+  @keyframes floating {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-floating {
+    animation: floating 4s ease-in-out infinite;
+  }
+}
