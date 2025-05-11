@@ -3,17 +3,33 @@ import { Resend } from 'resend';
 import { EmailTemplate } from '../../../components/EmailTemplate';
 
 // Initialize Resend with your API key - make sure to set RESEND_API_KEY in Vercel environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function POST(request: Request) {
   try {
+    // Check if Resend is properly initialized
+    if (!resend) {
+      console.error(
+        'Resend API key is missing. Please configure the RESEND_API_KEY environment variable.'
+      );
+      return NextResponse.json(
+        {
+          error:
+            'Email service is not configured properly. Please contact the administrator.',
+        },
+        { status: 500 }
+      );
+    }
+
     // Parse the request body
     let name, email, message;
     try {
       const body = await request.json();
       name = body.name;
       email = body.email;
-      message = body.message;    } catch {
+      message = body.message;
+    } catch {
       return NextResponse.json(
         { error: 'Invalid request format' },
         { status: 400 }
@@ -34,7 +50,7 @@ export async function POST(request: Request) {
       to: process.env.CONTACT_EMAIL || 'rasuen27@gmail.com', // Your email address
       subject: `New Contact Form Submission from ${name}`,
       react: await EmailTemplate({ name, email, message }),
-      replyTo: email
+      replyTo: email,
     });
 
     return NextResponse.json({ success: true, data });
