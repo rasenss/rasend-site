@@ -29,17 +29,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Initialize theme - always dark
   useEffect(() => {
     setMounted(true);
-    
-    try {
+      try {
       // Force dark theme
       localStorage.setItem("theme", "dark");
-    } catch (error) {
+    } catch (_) {
       console.log("Could not access localStorage");
     }
-  }, []);
-
-  // Apply theme changes to document
-  const applyTheme = (newTheme: Theme) => {
+  }, []);  // Apply theme changes to document
+  const applyTheme = (_theme: Theme) => {
     try {
       // Always apply dark mode
       document.documentElement.classList.add("dark");

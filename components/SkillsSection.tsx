@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, memo, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Code, Terminal, Figma, FileCode, Grid, Palette, Package, Layout, Globe, Settings, Shield, Database, Cloud, Smartphone, Zap, Server, PieChart, TrendingUp, Circle } from 'lucide-react';
+import { Terminal, Figma, FileCode, Grid, Layout, Globe, Shield, Database, Cloud, Smartphone, Zap, Server, TrendingUp, Circle } from 'lucide-react';
 import AnimatedSectionTitle from './AnimatedSectionTitle';
 
 // Enhanced skills data based on certifications and portfolio
@@ -450,8 +450,7 @@ const ViewToggle = memo(({ activeView, setActiveView }: { activeView: ViewType; 
 ViewToggle.displayName = 'ViewToggle';
 
 // Completely rewritten SkillComparison component with optimized animations
-const SkillComparison = memo(({ categories, selectedSkills, toggleSkill }: { 
-  categories: Category[], 
+const SkillComparison = memo(({ selectedSkills, toggleSkill }: { 
   selectedSkills: Skill[],
   toggleSkill: (skill: Skill) => void
 }) => {
@@ -589,7 +588,7 @@ const SkillComparison = memo(({ categories, selectedSkills, toggleSkill }: {
         <div className="absolute inset-0">
           {selectedSkills.map((skill) => {
             // Pre-calculate all points using the fixed angles for consistency
-            const points = axisAngles.map((angle, i) => {
+            const points = axisAngles.map((angle) => {
               const radian = (angle - 90) * (Math.PI / 180);
               const distance = skill.level / 100;
               return {
@@ -764,9 +763,9 @@ const CategoryShowcase = memo(function CategoryShowcase({
   }, [isActive]);
   
   // Simple debounce function for resize handler
-  function debounce(fn: Function, delay: number) {
+  function debounce(fn: (...args: unknown[]) => void, delay: number) {
     let timeoutId: ReturnType<typeof setTimeout>;
-    return function(...args: any[]) {
+    return function(...args: unknown[]) {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => fn(...args), delay);
     };
@@ -1169,7 +1168,6 @@ export default function SkillsSection() {
           className="mt-8"
         >
           <SkillComparison 
-            categories={categories} 
             selectedSkills={selectedSkills}
             toggleSkill={toggleSkill}
           />

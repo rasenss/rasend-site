@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef, createContext, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, Award, File, X, ZoomIn } from 'lucide-react';
+import { ArrowUpRight, File, X, ZoomIn } from 'lucide-react';
 import Image from 'next/image';
 import AnimatedSectionTitle from './AnimatedSectionTitle';
-import dynamic from 'next/dynamic';
 
 // Define certification data structure
 interface Skill {
@@ -31,10 +30,8 @@ const PDFThumbnail = ({ pdfUrl, alt }: { pdfUrl: string; alt: string }) => {
   // Extract certificate name for better display
   const fileName = pdfUrl.split('/').pop() || '';
   const certType = fileName.split('.')[0].toLowerCase();
-  
-  // Determine which icon/color to use based on certificate name
+    // Determine which icon/color to use based on certificate name
   let iconColor = "text-blue-400";
-  let bgColor = "from-blue-900/20 to-blue-800/10";
   
   if (certType.includes('aws') || certType.includes('cloud')) {
     iconColor = "text-blue-300";
@@ -42,7 +39,6 @@ const PDFThumbnail = ({ pdfUrl, alt }: { pdfUrl: string; alt: string }) => {
     iconColor = "text-red-400";
   } else if (certType.includes('google')) {
     iconColor = "text-green-400";
-    bgColor = "from-green-900/20 to-blue-900/10";
   }
   return (
     <div className={`relative h-full w-full flex items-center justify-center bg-[rgb(38,43,61)]`}>
@@ -328,21 +324,8 @@ const certifications: Certification[] = [
   }
 ];
 
-// Context for managing modal state globally
-const CertificateModalContext = React.createContext<{
-  openModal: (cert: Certification) => void;
-  closeModal: () => void;
-  currentCertificate: Certification | null;
-  isModalOpen: boolean;
-}>({
-  openModal: () => {},
-  closeModal: () => {},
-  currentCertificate: null,
-  isModalOpen: false
-});
-
-// Improved Certification card for list view with elegant animations
-const ListCertificationCard = ({ certification, index }: { certification: Certification; index: number }) => {
+/* CertificationCard component is defined here */
+const CertificationCard = ({ certification, index }: { certification: Certification, index: number }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -744,7 +727,7 @@ const CertCard = React.memo(function CertCard({ certification, index }: { certif
           onClick={() => {
             // Using a global context or parent component prop would be better
             // but for now we'll use it as is
-            const parentOpenModal = (window as any).__openCertificateModal;
+            const parentOpenModal = (window as Window & { __openCertificateModal?: (cert: Certification) => void }).__openCertificateModal;
             if (typeof parentOpenModal === 'function') {
               parentOpenModal(certification);
             }
@@ -921,10 +904,9 @@ const CertificationsSection = () => {
   };
   
   // Make openModal globally accessible for the CertCard component
-  useEffect(() => {
-    (window as any).__openCertificateModal = openModal;
+  useEffect(() => {    (window as Window & { __openCertificateModal?: (cert: Certification) => void }).__openCertificateModal = openModal;
     return () => {
-      delete (window as any).__openCertificateModal;
+      delete (window as Window & { __openCertificateModal?: (cert: Certification) => void }).__openCertificateModal;
     };
   }, []);
   

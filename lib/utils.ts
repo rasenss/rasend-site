@@ -49,9 +49,8 @@ export function useBreakpoint() {
     // Clean up
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   // Create a result object with each breakpoint as a boolean
-  const result: Record<`is${Capitalize<Breakpoint>}`, boolean> & Record<string, boolean> = {} as any;
+  const result: Record<`is${Capitalize<Breakpoint>}`, boolean> & Record<string, boolean> = {} as Record<`is${Capitalize<Breakpoint>}`, boolean> & Record<string, boolean>;
 
   // Check each breakpoint
   Object.entries(breakpoints).forEach(([key, value]) => {

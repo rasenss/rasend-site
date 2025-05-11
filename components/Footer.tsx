@@ -1,9 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useBreakpoint } from '@/lib/responsive';
-import ResponsiveText from './ResponsiveText';
 
 // Roman quotes that cycle through
 const quotes = [
@@ -122,10 +119,9 @@ const Footer = () => {
             <div className="absolute top-0 right-1/4 w-[1px] h-3 sm:h-4 bg-[#3a4264]/40"></div>
           </div>
           
-          {/* Roman Quote with Running Text Animation */}
-          <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-serif text-white mb-2 sm:mb-3 md:mb-4 italic tracking-wide leading-relaxed min-h-[40px] sm:min-h-[60px] flex items-center justify-center">
-            "{displayText}
-            <span className={isTypingQuote ? "inline-block w-1 h-4 sm:h-5 md:h-6 bg-[#4f83cc] ml-1 animate-pulse" : "hidden"}></span>"
+          {/* Roman Quote with Running Text Animation */}          <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-serif text-white mb-2 sm:mb-3 md:mb-4 italic tracking-wide leading-relaxed min-h-[40px] sm:min-h-[60px] flex items-center justify-center">
+            &ldquo;{displayText}
+            <span className={isTypingQuote ? "inline-block w-1 h-4 sm:h-5 md:h-6 bg-[#4f83cc] ml-1 animate-pulse" : "hidden"}></span>&rdquo;
           </h3>
           <p className="text-[var(--text-secondary)] text-sm xs:text-base sm:text-lg font-serif tracking-wider mb-6 sm:mb-8 md:mb-10 min-h-[20px] sm:min-h-[30px] flex items-center justify-center">
             {displayTranslation}

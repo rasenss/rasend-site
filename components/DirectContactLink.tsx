@@ -5,26 +5,24 @@ import { Mail } from 'lucide-react';
 
 export default function DirectContactLink({ className }: { className?: string }) {    const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    
+    e.stopPropagation();    
     // Use global contact navigation if available (from ContactNavFix)
-    if (typeof (window as any).__goToContact === 'function') {
-      (window as any).__goToContact();
+    if (typeof (window as Window & { __goToContact?: () => void }).__goToContact === 'function') {
+      (window as Window & { __goToContact?: () => void }).__goToContact?.();
       return false;
     }
     
     // Simple fallback implementation if global function isn't available
     const contactSection = document.getElementById('contact');
     if (!contactSection) return false;
-    
-    // Update active section in navbar
-    if (typeof (window as any).__updateActiveSection === 'function') {
-      (window as any).__updateActiveSection('contact');
+      // Update active section in navbar
+    if (typeof (window as Window & { __updateActiveSection?: (section: string) => void }).__updateActiveSection === 'function') {
+      (window as Window & { __updateActiveSection?: (section: string) => void }).__updateActiveSection?.('contact');
     }
     
     // Close mobile menu if open
-    if (typeof (window as any).__closeMobileMenu === 'function') {
-      (window as any).__closeMobileMenu();
+    if (typeof (window as Window & { __closeMobileMenu?: () => void }).__closeMobileMenu === 'function') {
+      (window as Window & { __closeMobileMenu?: () => void }).__closeMobileMenu?.();
     } else {
       const menuButton = document.querySelector('button[aria-label="Toggle menu"]');
       const menuXIcon = document.querySelector('svg.lucide-x');

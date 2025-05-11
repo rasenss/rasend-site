@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Bot, Instagram, Linkedin, Mail, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Github, Bot, Instagram, Linkedin, Mail, ArrowRight } from "lucide-react";
 import { ThemeProvider } from "../components/ThemeProvider";
 import SkillsSection from "../components/SkillsSection";
 import CertificationsSection from "../components/CertificationsSection";
@@ -773,9 +773,9 @@ export default function Home() {
                   viewport={{ once: true }}
                 >
                   <p className="text-gray-300 italic">
-                    "I believe in creating designs that are not only visually appealing but also functional 
+                    &ldquo;I believe in creating designs that are not only visually appealing but also functional 
                     and user-friendly. My goal is to blend aesthetics with practicality to deliver 
-                    exceptional digital experiences."
+                    exceptional digital experiences.&rdquo;
                   </p>
                 </motion.div>
               </motion.div>

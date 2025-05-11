@@ -18,31 +18,12 @@ const navVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
 };
 
-// Defined mobile menu animation variants
-const menuVariants = {
-  closed: { 
-    opacity: 0,
-    scale: 0.95,
-    transition: { duration: 0.2, ease: "easeIn" }
-  },
-  open: { 
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" }
-  }
-};
-
 export default function Navbar() {
-  const [activeSection, setActiveSection] = useState("home");
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track if the menu is open
+  const [activeSection, setActiveSection] = useState("home");  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to track if the menu is open
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   const [easterEggType, setEasterEggType] = useState<'explosion' | 'confetti' | 'matrix' | 'glitch' | null>(null);
-  const [clickCount, setClickCount] = useState(0);  const [isClicking, setIsClicking] = useState(false);
-  
-  // Use breakpoint hook for responsive behavior
-  const { isSm, isMd } = useBreakpoint();
-  const isMobile = !isMd; // Consider anything below md as mobile
+  const [clickCount, setClickCount] = useState(0);
+  const [isClicking, setIsClicking] = useState(false);
 
   // Refs
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -243,7 +224,6 @@ export default function Navbar() {
       return () => clearTimeout(timeout);
     }
   }, [easterEggType]);
-
   // Clean up any lingering timeouts when component unmounts
   useEffect(() => {
     return () => {
@@ -251,7 +231,7 @@ export default function Navbar() {
         clearTimeout(clickTimeoutRef.current);
       }
     };
-  }, [animationFrameId, navRef, setActiveSection]);
+  }, []);
   // Helper function to handle smooth scrolling to sections
   const scrollToSection = useCallback((id: string) => {
     const section = document.getElementById(id);
@@ -323,7 +303,7 @@ export default function Navbar() {
       // Prevent default scroll behavior that might be causing overshooting
       return false;
     }
-  }, [setActiveSection, navRef, animationFrameId, isMenuOpen]);  // Special dedicated function for navigating to contact section
+  }, []);// Special dedicated function for navigating to contact section
   const goToContactSection = useCallback(() => {
     // Use the global function from ContactNavFix if available
     if (typeof (window as any).__goToContact === 'function') {
@@ -697,4 +677,8 @@ export default function Navbar() {
       </motion.nav>
     </>
   );
+}
+
+function setIsVisible(arg0: boolean) {
+  throw new Error('Function not implemented.');
 }

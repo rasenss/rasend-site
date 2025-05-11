@@ -13,8 +13,7 @@ export async function POST(request: Request) {
       const body = await request.json();
       name = body.name;
       email = body.email;
-      message = body.message;
-    } catch (e) {
+      message = body.message;    } catch {
       return NextResponse.json(
         { error: 'Invalid request format' },
         { status: 400 }

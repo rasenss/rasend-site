@@ -1,4 +1,18 @@
 import { useEffect, useState } from 'react';
+
+// Define the PortfolioItem type
+type PortfolioItem = {
+  title: string;
+  category: string;
+  description: string;
+  technologies: string[];
+  links?: {
+    live?: string;
+  };
+  detailImages?: string[];
+  coverImage?: string;
+  image?: string;
+};
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { X, ExternalLink } from 'lucide-react';
@@ -124,7 +138,7 @@ export default function PortfolioItemModal({
   item, 
   onClose 
 }: { 
-  item: any, 
+  item: PortfolioItem, 
   onClose: () => void 
 }) {
   // Close on escape key

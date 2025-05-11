@@ -78,9 +78,8 @@ const InspirationalQuotes = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.5 }}
             className="min-h-[120px] flex items-center justify-center"
-          >
-            <h3 className="text-2xl md:text-3xl font-serif text-white italic tracking-wide leading-relaxed">
-              "{quotes[quoteIndex]}"
+          >            <h3 className="text-2xl md:text-3xl font-serif text-white italic tracking-wide leading-relaxed">
+              &ldquo;{quotes[quoteIndex]}&rdquo;
             </h3>
           </motion.div>
         </AnimatePresence>

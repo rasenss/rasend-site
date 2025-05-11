@@ -113,10 +113,9 @@ const QuotesCarousel = () => {
         </div>
         
         {/* Animated Quote Display with typing effect */}
-        <div className="text-center">
-          <h3 className="text-2xl md:text-3xl font-serif text-white mb-4 italic tracking-wide leading-relaxed min-h-[80px] flex items-center justify-center">
-            "{displayText}
-            <span className={isTypingQuote ? "inline-block w-1 h-6 bg-blue-500 ml-1 animate-pulse" : "hidden"}></span>"
+        <div className="text-center">          <h3 className="text-2xl md:text-3xl font-serif text-white mb-4 italic tracking-wide leading-relaxed min-h-[80px] flex items-center justify-center">
+            &ldquo;{displayText}
+            <span className={isTypingQuote ? "inline-block w-1 h-6 bg-blue-500 ml-1 animate-pulse" : "hidden"}></span>&rdquo;
           </h3>
           <p className="text-blue-300 text-lg font-serif tracking-wider mb-8 min-h-[40px] flex items-center justify-center">
             {displayMeaning}

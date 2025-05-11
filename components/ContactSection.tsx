@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mail, Phone, MapPin, Check, AlertCircle } from 'lucide-react';
+import { ArrowRight, Check, AlertCircle } from 'lucide-react';
 import ContactGameSection from './ContactGameSection';
-import { useBreakpoint } from '../lib/utils';
 
 type FormState = {
   name: string;
@@ -98,10 +97,9 @@ export default function ContactSection() {
       });
       
       // Parse the response
-      let data;
-      try {
+      let data;      try {
         data = await response.json();
-      } catch (e) {
+      } catch (_error) {
         throw new Error('Invalid response from server');
       }
       
@@ -157,7 +155,7 @@ export default function ContactSection() {
             className="flex items-center gap-2 bg-green-500/10 text-green-400 p-4 rounded-lg mb-4"
           >
             <Check className="shrink-0" />
-            <span>Your message has been sent! I'll get back to you soon.</span>
+            <span>Your message has been sent! I&apos;ll get back to you soon.</span>
           </motion.div>
         );
         
@@ -176,9 +174,7 @@ export default function ContactSection() {
       default:
         return null;    }
   };
-  
-  // Get breakpoint information for responsive behavior
-  const breakpoint = useBreakpoint();
+    // Component continues
   
   return (
     <section 
