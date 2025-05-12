@@ -430,9 +430,13 @@ export default function PortfolioSection() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
                   className="group"
-                >                  <div
+                  style={{
+                    willChange: "opacity",
+                    transform: "translateZ(0)" 
+                  }}
+                ><div
                     className="bg-[rgb(45,50,68)] rounded-xl overflow-hidden shadow-md h-full flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-200"
                     onClick={() => openProjectModal(item)}
                   >                    <div className="portfolio-image-container"

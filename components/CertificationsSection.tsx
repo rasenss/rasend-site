@@ -329,22 +329,21 @@ const CertificationCard = ({ certification, index }: { certification: Certificat
   const [showDetails, setShowDetails] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  return (
-    <motion.div
+  return (    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      exit={{ opacity: 0 }}
       transition={{ 
-        duration: 0.6, 
-        delay: index * 0.1,
-        ease: [0.22, 1, 0.36, 1]
-      }}      className="relative bg-[rgb(38,43,61)] border border-blue-500/20 rounded-xl overflow-hidden mb-6 
-                group hover:border-blue-400/40 transition-all duration-500"
-      whileHover={{ 
-        y: -4, 
-        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(59, 130, 246, 0.15)"
+        duration: 0.3, 
+        delay: Math.min(index * 0.05, 0.4), // Cap delay to avoid slow rendering
+        ease: "easeOut"
       }}
-      layout
+      style={{
+        willChange: "opacity, transform",
+        transform: "translateZ(0)"
+      }}      className="relative bg-[rgb(38,43,61)] border border-blue-500/20 rounded-xl overflow-hidden mb-6 
+                group hover:border-blue-400/40 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+      layout="position"
     >
       <div className="grid grid-cols-1 md:grid-cols-5">
         {/* Certificate image with elegant hover effect */}
@@ -508,21 +507,29 @@ const CertificationCard = ({ certification, index }: { certification: Certificat
       
       {/* Modal for certificate preview */}
       <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
+        {isModalOpen && (          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
             onClick={() => setIsModalOpen(false)}
+            style={{ willChange: "opacity" }}
           >
             <motion.div
-              initial={{ scale: 0.7 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.7 }}
-              transition={{ duration: 0.3, type: "spring", damping: 25 }}
-              className="bg-[rgb(38,43,61)] rounded-xl overflow-hidden shadow-xl max-w-4xl w-full max-h-[90vh] relative"
+              initial={{ scale: 0.9, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              transition={{ 
+                duration: 0.2, 
+                ease: "easeOut"
+              }}
+              className="bg-[rgb(38,43,61)] rounded-xl overflow-hidden shadow-xl max-w-4xl w-full max-h-[90vh] relative animate-gpu"
               onClick={(e) => e.stopPropagation()}
+              style={{ 
+                willChange: "transform",
+                transform: "translateZ(0)"
+              }}
             >
               {/* Close button */}
               <button
@@ -586,22 +593,36 @@ const CertificateModal = ({
   isOpen: boolean, 
   onClose: () => void, 
   certificate: Certification | null 
-}) => {
-  // Handle keyboard events
+}) => {  
+  // Handle keyboard events and navbar visibility
   useEffect(() => {
+    // Hide navbar when modal is open
+    if (typeof window !== 'undefined' && window.__toggleNavbarForCertificatePreview) {
+      window.__toggleNavbarForCertificatePreview(isOpen);
+    }
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    
-    if (isOpen) {
+      if (isOpen) {
       window.addEventListener('keydown', handleKeyDown);
       // Prevent scrolling on body when modal is open
       document.body.style.overflow = 'hidden';
+      
+      // Hide navbar when certificate modal is open
+      if (typeof window.__toggleNavbarForCertificatePreview === 'function') {
+        window.__toggleNavbarForCertificatePreview(true);
+      }
     }
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
+      
+      // Show navbar again when certificate modal is closed
+      if (typeof window.__toggleNavbarForCertificatePreview === 'function') {
+        window.__toggleNavbarForCertificatePreview(false);
+      }
     };
   }, [isOpen, onClose]);
 
@@ -699,6 +720,21 @@ const CertificateModal = ({
 // Memory-optimized Certificate Card component
 const CertCard = React.memo(function CertCard({ certification, index }: { certification: Certification; index: number }) {
   const [showDetails, setShowDetails] = useState(false);
+  
+  // Effect to manage navbar visibility when credential details are shown
+  useEffect(() => {
+    // Toggle navbar visibility based on credential details state
+    if (typeof (window as any).__toggleNavbarForCertificatePreview === 'function') {
+      (window as any).__toggleNavbarForCertificatePreview(showDetails);
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      if (showDetails && typeof (window as any).__toggleNavbarForCertificatePreview === 'function') {
+        (window as any).__toggleNavbarForCertificatePreview(false);
+      }
+    };
+  }, [showDetails]);
   
   // Calculate delay based on index but cap it to avoid long delays for many certificates
   const animationDelay = Math.min(index * 0.05, 0.8);
@@ -890,7 +926,6 @@ const CertificationsSection = () => {
     isOpen: false,
     certificate: null as Certification | null
   });
-  
   // Global modal control functions
   const openModal = (certificate: Certification) => {
     // Close any existing modal first
@@ -901,6 +936,11 @@ const CertificationsSection = () => {
     
     // Prevent scrolling
     document.body.style.overflow = 'hidden';
+    
+    // Hide navbar when certificate modal is open
+    if (typeof window.__toggleNavbarForCertificatePreview === 'function') {
+      window.__toggleNavbarForCertificatePreview(true);
+    }
   };
   
   // Make openModal globally accessible for the CertCard component
@@ -909,8 +949,7 @@ const CertificationsSection = () => {
       delete (window as Window & { __openCertificateModal?: (cert: Certification) => void }).__openCertificateModal;
     };
   }, []);
-  
-  const closeModal = () => {
+    const closeModal = () => {
     setModalState({
       isOpen: false,
       certificate: null
@@ -918,6 +957,11 @@ const CertificationsSection = () => {
     
     // Re-enable scrolling
     document.body.style.overflow = '';
+    
+    // Show navbar again when certificate modal is closed
+    if (typeof window.__toggleNavbarForCertificatePreview === 'function') {
+      window.__toggleNavbarForCertificatePreview(false);
+    }
   };
   
   // Memoize organizations list to prevent recalculation

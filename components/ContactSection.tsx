@@ -176,11 +176,10 @@ export default function ContactSection() {
   };
     // Component continues
   
-  return (
-    <section 
+  return (    <section 
       ref={sectionRef}
       id="contact" 
-      className="py-20 bg-[rgb(38,43,61)] relative isolate z-10 overflow-visible" 
+      className="py-20 bg-[rgb(38,43,61)] relative isolate z-10 overflow-visible border-0" 
       style={{ 
         scrollMarginTop: '8rem', // Single consistent value for better positioning
         contain: 'paint' // Improves rendering performance and isolation
@@ -216,16 +215,14 @@ export default function ContactSection() {
           </motion.p>
           
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-            {/* Contact Information */}
-            <motion.div 
+            {/* Contact Information */}            <motion.div 
               className="lg:col-span-2"
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-            >
-              <div className="bg-[rgb(38,43,61)]/80 backdrop-blur-sm p-8 rounded-2xl border border-blue-500/20 h-full">
-                {/* Replace this content with the game section */}
+            >              <div className="bg-[rgb(30,35,50)]/95 backdrop-blur-sm p-8 rounded-2xl border-0 h-full min-h-[600px] overflow-y-auto">
+                {/* Game section with improved container background */}
                 <ContactGameSection />
               </div>
             </motion.div>
@@ -238,7 +235,7 @@ export default function ContactSection() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <div className="bg-[rgb(38,43,61)]/80 backdrop-blur-sm p-8 rounded-2xl border border-blue-500/20">
+              <div className="bg-[rgb(38,43,61)]/80 backdrop-blur-sm p-8 rounded-2xl border-0">
                 <h3 className="text-2xl font-semibold text-white mb-6">Send me a message</h3>
                 
                 {/* Status message */}
@@ -246,8 +243,7 @@ export default function ContactSection() {
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm text-gray-400 mb-1">Name</label>
+                    <div>                      <label htmlFor="name" className="block text-sm text-gray-400 mb-1">Name</label>
                       <input 
                         id="name" 
                         name="name" 
@@ -256,12 +252,11 @@ export default function ContactSection() {
                         onChange={handleChange}
                         required
                         disabled={status === 'submitting'}
-                        className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white"
+                        className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white"
                       />
                     </div>
                     
-                    <div>
-                      <label htmlFor="email" className="block text-sm text-gray-400 mb-1">Email</label>
+                    <div>                      <label htmlFor="email" className="block text-sm text-gray-400 mb-1">Email</label>
                       <input 
                         id="email" 
                         name="email" 
@@ -270,13 +265,12 @@ export default function ContactSection() {
                         onChange={handleChange}
                         required
                         disabled={status === 'submitting'}
-                        className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white"
+                        className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white"
                       />
                     </div>
                   </div>
                   
-                  <div>
-                    <label htmlFor="message" className="block text-sm text-gray-400 mb-1">Message</label>
+                  <div>                    <label htmlFor="message" className="block text-sm text-gray-400 mb-1">Message</label>
                     <textarea 
                       id="message" 
                       name="message" 
@@ -285,7 +279,7 @@ export default function ContactSection() {
                       onChange={handleChange}
                       required
                       disabled={status === 'submitting'}
-                      className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white resize-none"
+                      className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:outline-none text-white resize-none"
                     ></textarea>
                   </div>
                   

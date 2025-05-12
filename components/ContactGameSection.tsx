@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, JSX } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gamepad2, Brain, Calculator, BookOpen, ArrowRight, Check, X, RefreshCw } from 'lucide-react';
 
@@ -129,65 +129,102 @@ export default function ContactGameSection() {
     }
     return gameCopy;
   }, []);
-
-  // Initialize or change game type
+  // Initialize or change game type - optimized to prevent flickering
   const startGame = useCallback((type: GameType) => {
     if (isAnimating) return; // Prevent starting game during animations
     
     setIsAnimating(true);
-    setActiveGame(type);
-    setCurrentQuestion(shuffledQuestions[type][questionIndex[type]]);
-    setSelectedAnswer(null);
-    setIsCorrect(null);
-    setShowExplanation(false);
     
-    // Reset animation lock after transition completes
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 300);
+    // Batch state updates together to prevent flickering
+    // Use a small delay to ensure proper transition
+    requestAnimationFrame(() => {
+      setActiveGame(type);
+      setCurrentQuestion(shuffledQuestions[type][questionIndex[type]]);
+      setSelectedAnswer(null);
+      setIsCorrect(null);
+      setShowExplanation(false);
+      
+      // Use requestAnimationFrame for smoother transitions
+      requestAnimationFrame(() => {
+        // Reset animation lock after transition completes
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 400); // Slightly longer to ensure transition completes
+      });
+    });
   }, [questionIndex, shuffledQuestions, isAnimating]);
-
-  // Handle answer selection
+  // Handle answer selection - optimized to prevent flickering
   const handleAnswerSelect = (answer: string) => {
     if (selectedAnswer !== null || !currentQuestion || isAnimating) return; // Prevent multiple selections and during animations
     
-    setSelectedAnswer(answer);
-    const correct = answer === currentQuestion.answer;
-    setIsCorrect(correct);
+    // Use a lock to prevent multiple rapid clicks
+    setIsAnimating(true);
     
-    if (correct && activeGame) {
-      setScore(prev => ({
-        ...prev,
-        [activeGame]: prev[activeGame] + 1
-      }));
-    }
+    // Use requestAnimationFrame to batch state updates in the next frame
+    requestAnimationFrame(() => {
+      const correct = answer === currentQuestion?.answer;
+      
+      // Batch state updates together
+      setSelectedAnswer(answer);
+      setIsCorrect(correct);
+      
+      if (correct && activeGame) {
+        setScore(prev => ({
+          ...prev,
+          [activeGame]: prev[activeGame] + 1
+        }));
+      }
+      
+      // Release animation lock before showing explanation
+      setIsAnimating(false);
 
-    // Show explanation after selecting an answer
-    setTimeout(() => {
-      setShowExplanation(true);
-    }, 500); // Reduced from 1000ms to 500ms for snappier feedback
+      // Show explanation after selecting an answer
+      // Use a consistent timing to avoid visual glitches
+      const showExplanationTimer = setTimeout(() => {
+        requestAnimationFrame(() => {
+          setShowExplanation(true);
+        });
+      }, 600); // Slightly longer but more stable transition
+      
+      // Clean up timer if component unmounts
+      return () => clearTimeout(showExplanationTimer);
+    });
   };
-
-  // Handle moving to the next question
+  // Handle moving to the next question - optimized to prevent flickering
   const handleNextQuestion = () => {
     if (!activeGame || isAnimating) return;
     
     setIsAnimating(true);
     const nextIndex = (questionIndex[activeGame] + 1) % shuffledQuestions[activeGame].length;
     
+    // First update the index
     setQuestionIndex(prev => ({
       ...prev,
       [activeGame]: nextIndex
     }));
     
-    // Add a small delay to prevent abrupt transitions
-    setTimeout(() => {
-      setCurrentQuestion(shuffledQuestions[activeGame][nextIndex]);
-      setSelectedAnswer(null);
-      setIsCorrect(null);
-      setShowExplanation(false);
-      setIsAnimating(false);
-    }, 150);
+    // Use a smoother transition with requestAnimationFrame
+    // This helps synchronize visual updates with the browser's rendering cycle
+    requestAnimationFrame(() => {
+      // Fade out current question first (handled by animation keys in the component)
+      
+      // Use a consistent delay to ensure smooth transition
+      setTimeout(() => {
+        // Batch these updates together in one render cycle
+        requestAnimationFrame(() => {
+          setCurrentQuestion(shuffledQuestions[activeGame][nextIndex]);
+          setSelectedAnswer(null);
+          setIsCorrect(null);
+          setShowExplanation(false);
+          
+          // Add a small delay before allowing new interactions
+          // This prevents rapid consecutive clicks that could cause flickering
+          setTimeout(() => {
+            setIsAnimating(false);
+          }, 100);
+        });
+      }, 200); // Slightly longer but more stable transition
+    });
   };
 
   // Reset the game scores
@@ -237,8 +274,7 @@ export default function ContactGameSection() {
     };
     setShuffledQuestions(newShuffled);
   }, [shuffleQuestions]);
-
-  // Game selection interface
+  // Game selection interface - with improved styling
   const GameSelector = () => (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-white mb-4">Ready for a Challenge?</h3>
@@ -246,10 +282,11 @@ export default function ContactGameSection() {
         Take a break and test your knowledge while your message is on its way!
       </p>
       
-      <div className="space-y-3">        <motion.button
+      <div className="space-y-3">
+        <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(38,43,61)] transition-colors"
+          className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(50,55,70)] transition-colors"
           onClick={() => startGame('logic')}
         >
           <span className="p-2 bg-blue-500/10 rounded-full">
@@ -260,11 +297,10 @@ export default function ContactGameSection() {
             <p className="text-sm text-gray-400">Test your reasoning skills</p>
           </div>
           <ArrowRight size={16} className="text-blue-400 ml-auto" />
-        </motion.button>
-          <motion.button
+        </motion.button>          <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(38,43,61)] transition-colors"
+          className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(50,55,70)] transition-colors"
           onClick={() => startGame('math')}
         >
           <span className="p-2 bg-blue-500/10 rounded-full">
@@ -279,7 +315,7 @@ export default function ContactGameSection() {
           <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(38,43,61)] transition-colors"
+          className="w-full p-3 bg-[rgb(38,43,61)] border-0 rounded-lg text-left flex items-center gap-3 hover:bg-[rgb(50,55,70)] transition-colors"
           onClick={() => startGame('history')}
         >
           <span className="p-2 bg-blue-500/10 rounded-full">
@@ -292,10 +328,9 @@ export default function ContactGameSection() {
           <ArrowRight size={16} className="text-blue-400 ml-auto" />
         </motion.button>
       </div>
-      
-      {/* Game scores */}
+        {/* Game scores */}
       {(score.logic > 0 || score.math > 0 || score.history > 0) && (
-        <div className="mt-6 p-3 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg">
+        <div className="mt-6 p-3 bg-[rgb(38,43,61)] border-0 rounded-lg">
           <div className="flex justify-between items-center mb-2">
             <p className="text-sm font-medium text-gray-300">Your Scores:</p>
             <button 
@@ -323,9 +358,7 @@ export default function ContactGameSection() {
         </div>
       )}
     </div>
-  );
-
-  // Game play interface
+  );  // Game play interface with improved styling
   const GamePlay = () => {
     if (!currentQuestion || !activeGame) return null;
     
@@ -341,7 +374,7 @@ export default function ContactGameSection() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="space-y-6 overflow-hidden"
+        className="space-y-6 overflow-visible bg-opacity-100 z-50" 
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -357,89 +390,159 @@ export default function ContactGameSection() {
           <div className="text-sm text-gray-400">
             Question {questionIndex[activeGame] + 1}/{shuffledQuestions[activeGame].length}
           </div>
-        </div>
-        
-        <motion.div 
-          key={`question-${questionIndex[activeGame]}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="p-4 bg-[rgb(38,43,61)] border border-blue-500/20 rounded-lg"
+        </div>          <motion.div 
+          key={`question-${activeGame}-${questionIndex[activeGame]}`}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -5 }}
+          transition={{ 
+            duration: 0.3,
+            ease: "easeOut",
+            opacity: { duration: 0.25 },
+            y: { duration: 0.3 }
+          }}
+          className="p-4 bg-[rgb(38,43,61)] border-0 rounded-lg will-change-transform relative z-10"
         >
-          <p className="text-white mb-4">{currentQuestion.question}</p>
-          
-          <div className="space-y-2">
+          <p className="text-white mb-4">{currentQuestion.question}</p>            <div className="space-y-2 relative z-10">
             {currentQuestion.options.map((option) => {
-              let buttonClass = "w-full p-3 rounded-lg text-left transition-colors";
-              // Change button style based on selected answer and correctness
-              if (selectedAnswer === option) {
-                buttonClass += isCorrect 
-                  ? " bg-green-500/20 border border-green-500/40 text-white" 
-                  : " bg-red-500/20 border border-red-500/40 text-white";
-              } else if (selectedAnswer !== null && option === currentQuestion.answer) {
-                // Highlight correct answer after user selects wrong answer
-                buttonClass += " bg-green-500/20 border border-green-500/40 text-white";
+              // Determine button styling based on answer state
+              const isSelectedOption = selectedAnswer === option;
+              const isCorrectAnswer = option === currentQuestion.answer;
+              const hasSelectedAnswer = selectedAnswer !== null;
+              
+              // Base style that doesn't change
+              const baseClass = "w-full p-3 rounded-lg text-left";
+              
+              // Determine styling based on game state
+              let styleClass = "";
+                if (!hasSelectedAnswer) {
+                // Unselected state
+                styleClass = "bg-[rgb(38,43,61)]/50 border-0 hover:bg-[rgb(50,55,70)] text-gray-300 transition-colors duration-150";
+              } else if (isSelectedOption && isCorrectAnswer) {
+                // Selected and correct
+                styleClass = "bg-green-500/20 border-0 text-white";
+              } else if (isSelectedOption && !isCorrectAnswer) {
+                // Selected but incorrect
+                styleClass = "bg-red-500/20 border-0 text-white";
+              } else if (isCorrectAnswer) {
+                // Not selected but is correct answer (show after wrong selection)
+                styleClass = "bg-green-500/20 border-0 text-white";
               } else {
-                buttonClass += " bg-[rgb(38,43,61)]/50 border border-blue-500/10 hover:bg-[rgb(38,43,61)] text-gray-300";
+                // Neither selected nor correct
+                styleClass = "bg-[rgb(38,43,61)]/50 border-0 text-gray-400";
               }
               
+              // Combine the styles
+              const buttonClass = `${baseClass} ${styleClass}`;
+              
               return (
-                <button
+                <motion.button
                   key={option}
                   className={buttonClass}
                   onClick={() => handleAnswerSelect(option)}
-                  disabled={selectedAnswer !== null || isAnimating}
+                  disabled={hasSelectedAnswer || isAnimating}
+                  initial={false}
+                  animate={{
+                    backgroundColor: hasSelectedAnswer ? 
+                      (isSelectedOption && isCorrectAnswer ? "rgba(16, 185, 129, 0.2)" :
+                       isSelectedOption ? "rgba(220, 38, 38, 0.2)" : 
+                       isCorrectAnswer ? "rgba(16, 185, 129, 0.2)" : 
+                       "rgba(38, 43, 61, 0.5)") : 
+                      "rgba(38, 43, 61, 0.5)"
+                  }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={!hasSelectedAnswer ? { scale: 1.005, backgroundColor: "rgba(38, 43, 61, 0.7)" } : {}}
+                  whileTap={!hasSelectedAnswer ? { scale: 0.995 } : {}}
                 >
                   <div className="flex items-center justify-between">
                     <span>{option}</span>
-                    {selectedAnswer === option && (
-                      isCorrect ? <Check size={16} className="text-green-400" /> : <X size={16} className="text-red-400" />
-                    )}
-                    {selectedAnswer !== null && selectedAnswer !== option && option === currentQuestion.answer && (
-                      <Check size={16} className="text-green-400" />
-                    )}
+                    <AnimatePresence mode="wait">
+                      {isSelectedOption && hasSelectedAnswer && (
+                        <motion.span
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", duration: 0.3 }}
+                        >
+                          {isCorrect ? 
+                            <Check size={16} className="text-green-400" /> : 
+                            <X size={16} className="text-red-400" />}
+                        </motion.span>
+                      )}
+                      {!isSelectedOption && hasSelectedAnswer && isCorrectAnswer && (
+                        <motion.span
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", duration: 0.3, delay: 0.15 }}
+                        >
+                          <Check size={16} className="text-green-400" />
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
-          
-          {/* Explanation */}
-          {showExplanation && currentQuestion.explanation && (
-            <motion.div 
-              ref={explanationRef}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              transition={{ duration: 0.3 }}
-              className="mt-4 p-3 bg-blue-500/10 rounded-lg overflow-hidden"
-            >
-              <p className="text-sm text-gray-300">
-                <span className="font-medium text-blue-400">Explanation:</span> {currentQuestion.explanation}
-              </p>
-            </motion.div>
-          )}
+            {/* Explanation - improved animation to prevent content jumps */}
+          <AnimatePresence>
+            {showExplanation && currentQuestion.explanation && (              <motion.div 
+                ref={explanationRef}
+                key="explanation"
+                initial={{ opacity: 0, height: 0, scale: 0.98 }}
+                animate={{ opacity: 1, height: "auto", scale: 1 }}
+                exit={{ opacity: 0, height: 0, scale: 0.98 }}
+                transition={{ 
+                  height: { duration: 0.35, ease: [0.33, 1, 0.68, 1] },
+                  opacity: { duration: 0.25 }
+                }}
+                style={{ willChange: "opacity, height" }}
+                className="mt-4 p-3 bg-blue-500/10 rounded-lg overflow-visible relative z-20 border-0"
+              >
+                <motion.p 
+                  className="text-sm text-gray-300"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <span className="font-medium text-blue-400">Explanation:</span> {currentQuestion.explanation}
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
-        
-        {/* Next question button */}
-        {selectedAnswer !== null && (
-          <motion.button
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className={`w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 ${isAnimating ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={handleNextQuestion}
-            disabled={isAnimating}
-          >
-            <span>Next Question</span>
-            <ArrowRight size={16} />
-          </motion.button>
-        )}
+          {/* Next question button - with smoother transitions */}
+        <AnimatePresence mode="wait">
+          {selectedAnswer !== null && (
+            <motion.button
+              key="next-button"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ 
+                duration: 0.25, 
+                ease: "easeOut" 
+              }}
+              whileHover={{ 
+                backgroundColor: "rgba(37, 99, 235, 1)",
+                scale: 1.01,
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.98 }}
+              style={{ willChange: "transform, opacity" }}              className={`w-full py-3 px-4 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 relative z-30 ${
+                isAnimating ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              onClick={handleNextQuestion}
+              disabled={isAnimating}
+            >
+              <span>Next Question</span>
+              <ArrowRight size={16} />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </motion.div>
     );
-  };
-
+  };  // Render components directly without memoization to avoid stale state issues
+  // More straightforward rendering approach
   return (
     <div className="h-full relative">
       <div className="flex items-center justify-center mb-6">
@@ -447,30 +550,14 @@ export default function ContactGameSection() {
         <h3 className="text-2xl font-semibold text-white">Brain Games</h3>
       </div>
       
-      <AnimatePresence mode="wait">
+      <div className="relative min-h-[450px]">
+        {/* Direct conditional rendering without memoization */}
         {activeGame === null ? (
-          <motion.div
-            key="selector"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <GameSelector />
-          </motion.div>
+          <GameSelector />
         ) : (
-          <motion.div
-            key={`gameplay-${activeGame}-${questionIndex[activeGame]}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="min-h-[300px]" // Add minimum height to prevent layout shift
-          >
-            <GamePlay />
-          </motion.div>
+          <GamePlay />
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

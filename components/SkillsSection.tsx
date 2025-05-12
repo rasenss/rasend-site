@@ -220,16 +220,14 @@ const SkillCard = memo(({
   isSelected?: boolean;
   onClick?: () => void;
 }) => {
-  return (
-    <motion.div
+  return (    <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.3, // Reduced animation duration for smoother experience
-        delay: index * 0.02, // Reduced delay for quicker rendering
-        type: "spring", 
-        stiffness: 70,
-        damping: 15
+        duration: 0.2, 
+        delay: Math.min(index * 0.015, 0.3), // Cap total delay to avoid slow rendering
+        type: "tween",
+        ease: "easeOut"
       }}
       onClick={onClick}      className={`relative p-5 rounded-[20px] border backdrop-blur-lg group hover:-translate-y-1 hover:shadow-xl transform-gpu transition-all duration-300 cursor-pointer
                 ${isSelected 
@@ -245,35 +243,14 @@ const SkillCard = memo(({
         transition: { duration: 0.2 }
       }}
       whileTap={{ scale: 0.98 }}
-    >
-      {/* More subtle particle background effect on hover - reduced number of particles */}
-      <div className="absolute -z-10 inset-0 rounded-[20px] opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none overflow-hidden">
-        <div className="particles-container w-full h-full">
-          {[...Array(1)].map((_, i) => ( // Reduced number of particles
-            <motion.div
-              key={i}
-              className="absolute w-1.5 h-1.5 rounded-full"
-              animate={{
-                x: [Math.random() * 100, Math.random() * 100],
-                y: [Math.random() * 100, Math.random() * 100],
-                opacity: [0, 0.5, 0],
-                scale: [0, 1, 0]
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-                ease: "easeInOut",
-                repeatDelay: 0.5
-              }}
-              style={{ 
-                left: `${Math.random() * 100}%`, 
-                top: `${Math.random() * 100}%`,
-                backgroundColor: skill.color 
-              }}
-            />
-          ))}
-        </div>
+    >      {/* Static gradient effect instead of animated particles for better performance */}
+      <div className="absolute -z-10 inset-0 rounded-[20px] opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none overflow-hidden">
+        <div 
+          className="w-full h-full" 
+          style={{ 
+            background: `radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, ${skill.color}50 0%, transparent 70%)` 
+          }}
+        />
       </div>
       
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br opacity-0 group-hover:opacity-10 rounded-[20px] transition-opacity duration-500" 
@@ -283,21 +260,24 @@ const SkillCard = memo(({
       <div className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-15 transition-all duration-400" 
            style={{ background: `linear-gradient(225deg, ${skill.color}20 0%, transparent 70%)` }} />
       
-      <div className="flex items-center gap-3 mb-4">
-        <motion.div 
-          initial={{ scale: 0.9, opacity: 0.5 }}
+      <div className="flex items-center gap-3 mb-4">        <motion.div 
+          initial={{ scale: 0.95, opacity: 0.7 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ 
-            duration: 0.5, 
-            delay: index * 0.03 + 0.1, 
-            type: "spring", 
-            bounce: 0.3 
+            duration: 0.3, 
+            delay: Math.min(index * 0.02, 0.2), 
+            type: "tween", 
+            ease: "easeOut" 
           }}
           className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 relative overflow-hidden"
-          style={{ backgroundColor: `${skill.color}15` }}
+          style={{ 
+            backgroundColor: `${skill.color}15`,
+            willChange: "transform, opacity",
+            transform: "translateZ(0)"
+          }}
           whileHover={{ 
             scale: 1.05,
-            transition: { duration: 0.2 } 
+            transition: { duration: 0.15 } 
           }}
         >
           <div className="absolute inset-0 opacity-20" style={{ 
@@ -853,7 +833,7 @@ const CategoryShowcase = memo(function CategoryShowcase({
 
 CategoryShowcase.displayName = 'CategoryShowcase';
 
-// Optimized skill card component with faster animations
+// Optimized skill card component with minimal animations to prevent freezing
 const OptimizedSkillCard = memo(({ 
   skill, 
   index, 
@@ -867,16 +847,16 @@ const OptimizedSkillCard = memo(({
 }) => {
   return (
     <div
-      onClick={onClick}      className={`relative p-5 rounded-[20px] border backdrop-blur-lg group transform-gpu transition-all duration-150 cursor-pointer
+      onClick={onClick}
+      className={`relative p-5 rounded-[20px] border backdrop-blur-lg group cursor-pointer
                 ${isSelected 
-                  ? 'bg-[rgb(38,43,61)]/95 border-blue-600/70 shadow-lg shadow-blue-900/20' 
-                  : `bg-gradient-to-br from-[rgb(38,43,61)]/95 to-[rgb(38,43,61)]/90 border-blue-900/50 hover:border-blue-800/60`}`}
+                  ? 'bg-[rgb(38,43,61)]/95 border-blue-600/70 shadow-lg' 
+                  : `bg-[rgb(38,43,61)]/90 border-blue-900/50 hover:border-blue-800/60`}`}
       style={{
         borderColor: isSelected ? undefined : 'transparent',
-        willChange: 'transform, opacity',
-        transform: 'translateZ(0)', // Force GPU acceleration
-        opacity: 0,
-        animation: `fadeIn 0.15s ease-out ${index * 0.01}s forwards` // Ultra-fast entry animation
+        willChange: 'opacity',
+        opacity: 1, // Start visible immediately to avoid animation cost
+        transition: 'border-color 0.2s ease', // Use CSS transition instead of animation
       }}
     >
       <div className="flex items-center gap-3 mb-4">
@@ -939,7 +919,7 @@ OptimizedSkillCard.displayName = 'OptimizedSkillCard';
 
 // Main SkillsSection component - optimized for performance
 export default function SkillsSection() {
-  const [activeCategory, setActiveCategory] = useState<string | null>("frontend"); // Set a default active category
+  const [activeCategory, setActiveCategory] = useState<string | null>(null); // No default active category - user must click to expand
   const [viewType, setViewType] = useState<ViewType>('grid');
   const [filterTerm, setFilterTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -981,14 +961,16 @@ export default function SkillsSection() {
     
     return { totalCount, avgProficiency, topSkills };
   }, []);
-
-  // Handle filter toggle
+  // Handle filter toggle with debouncing to prevent UI freezing
   const toggleFilter = useCallback((filter: string) => {
-    setActiveFilters(prev => 
-      prev.includes(filter) 
-        ? prev.filter(f => f !== filter) 
-        : [...prev, filter]
-    );
+    // Use requestAnimationFrame to debounce the state update
+    requestAnimationFrame(() => {
+      setActiveFilters(prev => 
+        prev.includes(filter) 
+          ? prev.filter(f => f !== filter) 
+          : [...prev, filter]
+      );
+    });
   }, []);
 
   // Get filtered categories based on active filters
@@ -1024,41 +1006,35 @@ export default function SkillsSection() {
     const style = document.createElement('style');
     style.innerHTML = `
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translate3d(0, 5px, 0); }
+        to { opacity: 1; transform: translate3d(0, 0, 0); }
       }
       @keyframes growWidth {
         from { width: 0; }
       }
       @keyframes glow {
-        0% { opacity: 0.4; box-shadow: 0 0 2px rgba(59, 130, 246, 0.3); }
-        50% { opacity: 0.7; box-shadow: 0 0 4px rgba(59, 130, 246, 0.5); }
-        100% { opacity: 0.5; box-shadow: 0 0 3px rgba(59, 130, 246, 0.4); }
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.6; }
       }
       @keyframes pulse1 {
-        0% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.01); opacity: 0.65; }
-        100% { transform: scale(1); opacity: 0.5; }
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 0.65; }
       }
       @keyframes pulse2 {
-        0% { transform: scale(1); opacity: 0.55; }
-        50% { transform: scale(1.015); opacity: 0.7; }
-        100% { transform: scale(1); opacity: 0.55; }
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 0.7; }
       }
       @keyframes pulse3 {
-        0% { transform: scale(1); opacity: 0.6; }
-        50% { transform: scale(1.02); opacity: 0.75; }
-        100% { transform: scale(1); opacity: 0.6; }
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 0.75; }
       }
       @keyframes pulse4 {
-        0% { transform: scale(1); opacity: 0.65; }
-        50% { transform: scale(1.025); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 0.65; }
+        0%, 100% { opacity: 0.65; }
+        50% { opacity: 0.75; }
       }
       @keyframes pulse5 {
-        0% { transform: scale(1); opacity: 0.7; }
-        50% { transform: scale(1.03); opacity: 0.85; }
-        100% { transform: scale(1); opacity: 0.7; }
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 0.8; }
       }
       @keyframes ping-slow {
         0%, 100% { transform: scale(1); opacity: 0.75; }

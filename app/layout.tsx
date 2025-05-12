@@ -5,6 +5,10 @@ import ClientNavbarWrapper from '@/components/ClientNavbarWrapper'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Footer from '@/components/Footer'
 import ContactNavFix from '@/components/ContactNavFix'
+import NavbarEnhancer from '@/components/NavbarEnhancer'
+import AnimationOptimizer from '@/components/AnimationOptimizer'
+import PerformanceOptimizer from '@/components/PerformanceOptimizer'
+import Script from 'next/script'
 
 
 // Optimize font loading
@@ -47,9 +51,49 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${poppins.variable} scroll-smooth dark`}>
+    <html lang="en" className={`${poppins.variable} scroll-smooth dark optimize-animations`}>
+      <head>
+        {/* Hydration error fix script - must run before React hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Ensure optimize-animations class is always present to prevent hydration mismatch
+              if (!document.documentElement.classList.contains('optimize-animations')) {
+                document.documentElement.classList.add('optimize-animations');
+              }
+            `
+          }}
+        />
+      </head>
       <body className="bg-gray-900 text-white">
+        {/* Early-loaded animation optimization script */}
+        <Script
+          id="animation-perf-early"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Reduced motion preference check only - class already added in JSX
+              
+              // Check for reduced motion preference
+              if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.documentElement.classList.add('reduce-motion-preferred');
+              }
+              
+              // Detect low-end devices
+              if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                  (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+                  window.innerWidth < 768) {
+                document.documentElement.classList.add('low-end-device');
+              }
+            `
+          }}
+        />
+        <NavbarEnhancer />
         <ThemeProvider>
+          {/* Performance optimizers for better animation rendering */}
+          <AnimationOptimizer />
+          <PerformanceOptimizer />
+          <Script src="/optimizeAnimations.js" strategy="afterInteractive" />
           <ClientNavbarWrapper />
           <div className="flex flex-col min-h-screen">
             <main className="flex-grow pt-16 sm:pt-20 md:pt-24 px-3 xs:px-4 sm:px-5 md:px-6 lg:px-8">

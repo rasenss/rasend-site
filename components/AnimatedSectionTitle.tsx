@@ -22,33 +22,109 @@ const AnimatedSectionTitle = ({
   hideSubtitle = false // Default to showing subtitle
 }: AnimatedSectionTitleProps) => {
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
-  const hasMultipleSubtitles = subtitles && subtitles.length > 0;
-  
-  // Rotate through subtitles if multiple are provided
+  const hasMultipleSubtitles = subtitles && subtitles.length > 0;  // Rotate through subtitles if multiple are provided - performance optimized
   useEffect(() => {
     if (!hasMultipleSubtitles || hideSubtitle) return;
     
-    const intervalId = setInterval(() => {
-      setCurrentSubtitleIndex(prevIndex => 
-        prevIndex === subtitles.length - 1 ? 0 : prevIndex + 1
-      );
-    }, rotationInterval);
+    // Only run rotation when document has focus, is visible, and element is in viewport
+    let intervalId: NodeJS.Timeout | null = null;
+    let observer: IntersectionObserver | null = null;
+    let isInViewport = false;
+    let frameId: number | null = null;
     
-    return () => clearInterval(intervalId);
+    const titleRef = document.querySelector('.section-title-component');
+    
+    const startRotation = () => {
+      if (intervalId) return; // Already running
+      
+      // Use memory-efficient approach with less frequent updates
+      intervalId = setInterval(() => {
+        // Only update when tab is active AND element is in viewport
+        if (document.visibilityState === 'visible' && isInViewport) {
+          // Use a single animation frame for smoother transitions
+          if (frameId) cancelAnimationFrame(frameId);
+          
+          frameId = requestAnimationFrame(() => {
+            setCurrentSubtitleIndex(prevIndex => 
+              prevIndex === subtitles.length - 1 ? 0 : prevIndex + 1
+            );
+            frameId = null;
+          });
+        }
+      }, rotationInterval);
+    };
+      const stopRotation = () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+        frameId = null;
+      }
+      
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+      // Use intersection observer to detect when element is in viewport
+    if (typeof IntersectionObserver !== 'undefined' && titleRef) {
+      observer = new IntersectionObserver((entries) => {
+        isInViewport = entries[0]?.isIntersecting || false;
+        
+        if (isInViewport && document.visibilityState === 'visible') {
+          startRotation();
+        } else {
+          stopRotation();
+        }
+      }, { threshold: 0.2 }); // Only needs to be 20% visible
+      
+      observer.observe(titleRef);
+    } else {
+      // Fallback if IntersectionObserver is not available
+      isInViewport = true;
+      startRotation();
+    }
+    
+    // Pause rotation when tab is not visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isInViewport) {
+        startRotation();
+      } else {
+        stopRotation();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      if (observer) observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopRotation();
+    };
   }, [subtitles, rotationInterval, hasMultipleSubtitles, hideSubtitle]);
 
   // Get current subtitle to display
   const currentSubtitle = hasMultipleSubtitles 
     ? subtitles[currentSubtitleIndex]
     : subtitle;
-
   return (
-    <div className="mb-8">
-      <motion.div
+    <div className="mb-8 section-title-component motion-reduce"><motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
+        transition={{ 
+          duration: 0.3, 
+          type: "tween", 
+          ease: "easeOut" 
+        }}
+        viewport={{ 
+          once: true, 
+          margin: "-10% 0px -10% 0px", 
+          amount: "some" 
+        }}
+        style={{ 
+          willChange: "opacity, transform",
+          backfaceVisibility: "hidden",
+          transform: "translateZ(0)",
+          WebkitFontSmoothing: "subpixel-antialiased"
+        }}
         className="flex items-center gap-3"
       >
         {Icon && (
@@ -58,28 +134,44 @@ const AnimatedSectionTitle = ({
         )}
         
         <h2 className="text-3xl md:text-4xl font-bold relative inline-block">
-          {title}
-          <motion.span 
+          {title}          <motion.span 
             className="absolute -bottom-1 left-0 w-full h-1 bg-blue-500"
-            initial={{ width: 0 }}
-            whileInView={{ width: "100%" }}
-            transition={{ delay: 0.3, duration: 0.6 }}
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ 
+              delay: 0.15, 
+              duration: 0.2, 
+              ease: "easeOut" 
+            }}
             viewport={{ once: true }}
+            style={{ 
+              willChange: "transform",
+              transform: "translateZ(0) scaleX(0)",
+              transformOrigin: "left",
+              backfaceVisibility: "hidden"
+            }}
           />
         </h2>
-      </motion.div>
-      
-      {!hideSubtitle && (
-        <div className="min-h-[3.5rem] mt-4">
-          <AnimatePresence mode="wait">
+      </motion.div>      {!hideSubtitle && (
+        <div className="min-h-[3.5rem] mt-4 subtitle-rotation animate-gpu">
+          <AnimatePresence mode="wait" initial={false}>
             {currentSubtitle && (
               <motion.p 
                 key={currentSubtitle}
                 className="text-lg text-gray-400 max-w-2xl"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ 
+                  duration: 0.2, 
+                  ease: "easeOut"
+                }}
+                style={{ 
+                  willChange: "opacity, transform",
+                  backfaceVisibility: "hidden",
+                  transform: "translateZ(0)",
+                  position: "absolute"
+                }}
               >
                 {currentSubtitle}
               </motion.p>

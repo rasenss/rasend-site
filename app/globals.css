@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Navbar hidden state */
+.navbar-hidden {
+  visibility: hidden !important;
+}
+
 /* Portfolio aspect ratio classes */
 .portfolio-image-container {
   position: relative;
@@ -26,25 +31,8 @@
   max-height: 300px;
 }
 
-/* Custom base s  .contact-highlight {
-    animation: highlight-section 1.5s ease-in-out;
-    position: relative;
-  }
-  
-  .contact-highlight::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-    pointer-events: none;
-    animation: highlight-focus 1.5s ease-in-out;
-    outline: 0px solid transparent;
-    outline-offset: 2px;
-    border-radius: 8px;
-  }es */
+/* Contact highlight removed */
+
 @layer base {
   /* Enhanced scrolling behavior */
   html {
@@ -78,20 +66,22 @@
     z-index: -1;
   }
   
-  /* Simplified animation for contact section highlight */
+  /* Optimized animation for contact section highlight using box-shadow instead of outline */
   @keyframes highlight-section {
-    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-    30% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.5); }
-    70% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); }
-    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    30% { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5); }
+    70% { box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
   }
   
-  /* Simplified implementation for better performance and fewer visual glitches */
+  /* Performance-optimized implementation using GPU-accelerated properties */
   .contact-highlight {
-    animation: highlight-section 1.5s ease-in-out;
+    animation: highlight-section 1.25s ease-out;
     position: relative;
     z-index: 10;
     outline: none;
+    transform: translateZ(0); /* Force GPU acceleration */
+    will-change: box-shadow;
   }
   
   :root {
@@ -232,6 +222,43 @@
   }
 }
 
+/* Performance optimizations for animations */
+.animate-gpu,
+.motion-reduce {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Apply GPU acceleration to specific animation-heavy elements */
+.navbar-transition-complete,
+motion-nav,
+.portfolio-image-container,
+.backdrop-blur-lg,
+.motion-div {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Reduce animation intensity when user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optimize specific component animations */
+.portfolio-image-container img {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 /* Custom utilities */
 @layer utilities {
   /* Responsive text truncation */
@@ -307,6 +334,82 @@
 
   .animate-running-text {
     animation: running-text 0.8s forwards;
+  }
+  
+  /* Animation optimization utilities */
+  /* GPU acceleration for smoother animations */
+  .animate-gpu {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  /* Specific optimization classes for different performance levels */
+  .low-end-device .animate-gpu {
+    will-change: auto; /* Don't use will-change on low-end devices */
+  }
+  
+  /* Animation performance classes */
+  .animation-paused {
+    animation-play-state: paused !important;
+    transition: none !important;
+  }
+  
+  /* Tab visibility optimization */
+  .tab-hidden .motion-pausable,
+  .tab-hidden .animate-gpu {
+    animation-play-state: paused !important;
+    transition: none !important;
+  }
+  
+  /* Motion reduction preferences */
+  @media (prefers-reduced-motion) {
+    .motion-reduce {
+      transition-duration: 0.05s !important;
+      animation-duration: 0.05s !important;
+    }
+    
+    .motion-pausable {
+      animation-play-state: paused !important;
+      transition: none !important;
+    }
+  }
+  
+  /* Pause animations when document is not visible */
+  :root:not(:focus-within) .motion-pausable {
+    animation-play-state: paused !important;
+    transition: none !important;
+  }
+  
+  /* Performance optimization levels */
+  .perf-level-1 .subtitle-rotation {
+    animation-duration: 0.5s !important;
+    transition-duration: 0.5s !important;
+  }
+  
+  .perf-level-2 .subtitle-rotation {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  /* Better animation performance class */
+  .performance-animations {
+    transition-property: transform, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+  
+  /* Reduced animation classes */
+  .reduce-motion {
+    --animation-duration: 0.2s !important;
+    --transition-duration: 0.2s !important;
+  }
+  
+  .minimal-animation .animate-running-text,
+  .minimal-animation .motion-div,
+  .minimal-animation .subtitle-rotation {
+    animation: none !important;
+    transition: none !important;
   }
 
   /* Hero section gradients */

@@ -22,25 +22,26 @@ const EasterEgg: React.FC<EasterEggProps> = ({ type }) => {
   const renderEasterEggContent = () => {
     switch (type) {
       case 'explosion':
-        return (
-          <motion.div 
-            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        return (          <motion.div 
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ willChange: "opacity" }}
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ 
-                scale: [0.5, 1.2, 0.8],
-                opacity: [0, 1, 0],
-                rotate: [0, 10, -10, 0]
+                scale: [0.5, 1.1, 0.8],
+                opacity: [0, 1, 0]
               }}
               transition={{ 
-                duration: 1.5,
+                duration: 1.2,
                 times: [0, 0.5, 1],
                 ease: "easeInOut"
               }}
+              style={{ willChange: "transform, opacity" }}
               className="relative"
             >
               <div className="w-60 h-60 md:w-96 md:h-96 relative">
