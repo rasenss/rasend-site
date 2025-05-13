@@ -8,6 +8,7 @@ import ContactNavFix from '@/components/ContactNavFix'
 import NavbarEnhancer from '@/components/NavbarEnhancer'
 import AnimationOptimizer from '@/components/AnimationOptimizer'
 import PerformanceOptimizer from '@/components/PerformanceOptimizer'
+import MobileCompatFix from '@/components/MobileCompatFix'
 import Script from 'next/script'
 
 
@@ -49,8 +50,7 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
-  return (
+}) {  return (
     <html lang="en" className={`${poppins.variable} scroll-smooth dark optimize-animations`}>
       <head>
         {/* Hydration error fix script - must run before React hydration */}
@@ -60,6 +60,10 @@ export default function RootLayout({
               // Ensure optimize-animations class is always present to prevent hydration mismatch
               if (!document.documentElement.classList.contains('optimize-animations')) {
                 document.documentElement.classList.add('optimize-animations');
+              }
+              // Remove any dynamically-added classes that cause hydration mismatches
+              if (document.documentElement.classList.contains('low-end-device')) {
+                document.documentElement.classList.remove('low-end-device');
               }
             `
           }}
@@ -78,21 +82,21 @@ export default function RootLayout({
               if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 document.documentElement.classList.add('reduce-motion-preferred');
               }
-              
-              // Detect low-end devices
+                // Instead of adding the class directly, we'll set a data attribute
+              // This avoids hydration mismatches since data attributes don't affect rendering directly
               if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                   (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
                   window.innerWidth < 768) {
-                document.documentElement.classList.add('low-end-device');
+                document.documentElement.dataset.lowEndDevice = 'true';
               }
             `
           }}
         />
         <NavbarEnhancer />
         <ThemeProvider>
-          {/* Performance optimizers for better animation rendering */}
-          <AnimationOptimizer />
+          {/* Performance optimizers for better animation rendering */}          <AnimationOptimizer />
           <PerformanceOptimizer />
+          <MobileCompatFix />
           <Script src="/optimizeAnimations.js" strategy="afterInteractive" />
           <ClientNavbarWrapper />
           <div className="flex flex-col min-h-screen">

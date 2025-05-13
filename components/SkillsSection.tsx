@@ -409,10 +409,10 @@ SkillListItem.displayName = 'SkillListItem';
 // View toggle (simplified for performance)
 const ViewToggle = memo(({ activeView, setActiveView }: { activeView: ViewType; setActiveView: (view: ViewType) => void }) => {
   return (
-    <div className="flex bg-[rgb(38,43,61)]/90 p-1 rounded-full border border-blue-900/60 shadow-inner shadow-black/20">
+    <div className="flex w-full sm:w-auto bg-[rgb(28,33,51)] skills-mobile-bg p-1 rounded-full border border-blue-900/60 shadow-inner shadow-black/20">
       {(['grid', 'list'] as ViewType[]).map(view => (
         <button
-          key={view}          className={`relative px-4 py-1.5 text-sm rounded-full transition-all duration-200 ${
+          key={view}          className={`relative flex-1 sm:flex-auto px-4 py-1.5 text-sm rounded-full transition-all duration-200 ${
             activeView === view ? 'text-white' : 'text-gray-300 hover:text-white'
           }`}
           onClick={() => setActiveView(view)}
@@ -642,12 +642,11 @@ const SkillComparison = memo(({ selectedSkills, toggleSkill }: {
             </div>
           ))}
         </div>
-      </div>
-      
-      {/* Skill selection with simplified animations */}
+      </div>        {/* Skill selection with simplified animations */}
       <div className="mt-4 pt-4 border-t border-blue-900/40">
-        <div className="flex justify-between items-center mb-3">
-          <h4 className="text-sm font-medium text-white">Selected Skills</h4>          <span className="text-xs text-blue-300 bg-[rgb(28,33,51)] px-2.5 py-1 rounded-lg border border-blue-900/40">
+        <div className="flex flex-wrap justify-between items-center mb-3">
+          <h4 className="text-sm font-medium text-white mb-2 sm:mb-0">Selected Skills</h4>
+          <span className="text-xs text-blue-300 bg-[rgb(28,33,51)] px-2.5 py-1 rounded-lg border border-blue-900/40">
             {selectedSkills.length}/5 selected
           </span>
         </div>
@@ -1156,9 +1155,8 @@ export default function SkillsSection() {
           transition={{ duration: 0.4, delay: 0.3 }}
           viewport={{ once: true }}
           className="mt-8 bg-[rgb(38,43,61)]/95 rounded-[20px] p-5 border border-blue-900/60 backdrop-blur-sm shadow-lg"
-        >
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="relative flex-grow max-w-md">
+        >          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="relative flex-grow w-full sm:max-w-md">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -1170,7 +1168,7 @@ export default function SkillsSection() {
                 value={filterTerm}
                 onChange={(e) => setFilterTerm(e.target.value)}
                 placeholder="Search skills..."
-                className="bg-[rgb(38,43,61)]/90 text-white border border-blue-900/60 rounded-lg pl-10 pr-4 py-2.5 w-full focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-700 transition-all"
+                className="bg-[rgb(28,33,51)] skills-mobile-bg text-white border border-blue-900/60 rounded-lg pl-10 pr-4 py-2.5 w-full focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-700 transition-all"
               />
               {filterTerm && (
                 <button 
@@ -1185,10 +1183,11 @@ export default function SkillsSection() {
               )}
             </div>
             
-            <ViewToggle activeView={viewType} setActiveView={setViewType} />
+            <div className="w-full sm:w-auto skills-mobile-bg">
+              <ViewToggle activeView={viewType} setActiveView={setViewType} />
+            </div>
           </div>
-          
-          {/* Category filter tags with better contrast */}
+            {/* Category filter tags with better contrast */}
           <div className="mt-4 flex flex-wrap gap-2">
             {categories.map((category, index) => (
               <motion.button
@@ -1197,9 +1196,9 @@ export default function SkillsSection() {
                 transition={{ duration: 0.3, delay: 0.1 + (index * 0.05) }}
                 key={category.id}
                 onClick={() => toggleFilter(category.id)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all skills-mobile-bg ${
                   activeFilters.includes(category.id)                    ? 'bg-gradient-to-r from-blue-900 to-blue-800 text-white shadow-md'
-                    : 'bg-[rgb(38,43,61)]/90 border border-blue-900/60 text-slate-300 hover:text-white hover:border-blue-800/70'
+                    : 'bg-[rgb(28,33,51)] border border-blue-900/60 text-slate-300 hover:text-white hover:border-blue-800/70'
                 }`}
               >
                 <div className="flex items-center gap-1.5">

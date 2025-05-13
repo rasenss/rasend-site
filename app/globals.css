@@ -5,6 +5,74 @@
   visibility: hidden !important;
 }
 
+/* Mobile-specific fixes */
+@media (max-width: 640px) {
+  /* Mobile navbar menu improvements */
+  .navbar-mobile-menu {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Fix skills section on mobile */
+  .skills-search {
+    width: 100%;
+  }
+  
+  /* Fix view toggle on mobile */
+  .view-toggle-mobile {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* Fix navbar menu items */
+  .navbar-menu-item {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    background-color: transparent;
+  }
+  
+  .navbar-menu-item:hover, .navbar-menu-item.active {
+    background-color: rgba(37, 99, 235, 0.8) !important;
+  }
+}
+
+/* Low-end device fixes */
+html[data-low-end-device="true"] .navbar-mobile-menu {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-low-end-device="true"] .skills-search {
+  width: 100%;
+}
+
+html[data-low-end-device="true"] .view-toggle-mobile {
+  display: flex;
+  width: 100%;
+}
+
+html[data-low-end-device="true"] .navbar-menu-item {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  background-color: transparent;
+}
+
+html[data-low-end-device="true"] .navbar-menu-item:hover,
+html[data-low-end-device="true"] .navbar-menu-item.active {
+  background-color: rgba(37, 99, 235, 0.8) !important;
+}
+
+/* Fix skills section background - applied via JavaScript to avoid hydration issues */
+.skills-mobile-bg {
+  background-color: rgb(28, 33, 51) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  border-radius: 12px !important;
+}
+
 /* Portfolio aspect ratio classes */
 .portfolio-image-container {
   position: relative;
@@ -335,8 +403,7 @@ motion-nav,
   .animate-running-text {
     animation: running-text 0.8s forwards;
   }
-  
-  /* Animation optimization utilities */
+    /* Animation optimization utilities */
   /* GPU acceleration for smoother animations */
   .animate-gpu {
     will-change: transform, opacity;
@@ -345,7 +412,8 @@ motion-nav,
   }
   
   /* Specific optimization classes for different performance levels */
-  .low-end-device .animate-gpu {
+  /* Use data attribute instead of class to avoid hydration issues */
+  html[data-low-end-device="true"] .animate-gpu {
     will-change: auto; /* Don't use will-change on low-end devices */
   }
   
@@ -380,14 +448,15 @@ motion-nav,
     animation-play-state: paused !important;
     transition: none !important;
   }
-  
-  /* Performance optimization levels */
-  .perf-level-1 .subtitle-rotation {
+    /* Performance optimization levels */
+  /* Use attribute selectors to avoid hydration issues with dynamic classes */
+  html[data-perf-level="1"] .subtitle-rotation {
     animation-duration: 0.5s !important;
     transition-duration: 0.5s !important;
   }
   
-  .perf-level-2 .subtitle-rotation {
+  html[data-perf-level="2"] .subtitle-rotation,
+  html[data-low-end-device="true"] .subtitle-rotation {
     animation: none !important;
     transition: none !important;
   }

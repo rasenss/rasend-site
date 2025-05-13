@@ -707,11 +707,13 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
                 ease: "easeOut"
               }}
               className="lg:hidden overflow-hidden bg-gray-900/95 rounded-2xl mt-2 
-                border border-gray-700 shadow-xl animate-gpu"
+                border border-gray-700 shadow-xl animate-gpu fixed left-4 right-4 z-50 navbar-mobile-menu"
               style={{ 
                 willChange: "opacity",
                 backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)'
+                transform: 'translateZ(0)',
+                maxHeight: 'calc(100vh - 80px)',
+                overflowY: 'auto'
               }}
             >
               <div className="px-4 py-3 space-y-2">
@@ -753,8 +755,7 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
                         delay: 0.05 + (index * 0.03),
                         ease: "easeOut"
                       }}
-                    >
-                      <Link
+                    >                      <Link
                         href={`#${item.id}`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -787,10 +788,10 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
                           // Regular sections use standard scrolling
                           return scrollToSection(item.id);
                         }}
-                        className={`flex items-center space-x-3 w-full px-4 py-3 rounded-xl 
+                        className={`navbar-menu-item flex items-center space-x-3 w-full px-4 py-3 rounded-xl 
                           transition-colors duration-150 active:scale-98 ${
                           activeSection === item.id
-                            ? 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-md border border-blue-500/20'
+                            ? 'bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-md border border-blue-500/20 active'
                             : 'text-gray-300 hover:bg-gray-800/70 border border-transparent hover:border-gray-700'
                         }`}
                       >
