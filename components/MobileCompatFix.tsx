@@ -4,10 +4,26 @@ import { useEffect } from 'react';
 
 // This component is responsible for fixing mobile compatibility issues
 // by applying additional CSS rules and classes to specific elements
-export default function MobileCompatFix() {
-  useEffect(() => {
+export default function MobileCompatFix() {  useEffect(() => {
     // Apply mobile fixes when the component mounts
     const applyMobileFixes = () => {
+      // Ensure the mobile menu closes when clicking outside of it
+      const handleOutsideClick = (e: MouseEvent) => {
+        const mobileMenu = document.querySelector('.navbar-mobile-menu');
+        const mobileMenuButton = document.querySelector('button[aria-label="Toggle menu"]');
+        
+        if (mobileMenu && !mobileMenu.contains(e.target as Node) && 
+            mobileMenuButton && !mobileMenuButton.contains(e.target as Node)) {
+          // Call the close menu function if it exists
+          if (typeof (window as any).__closeMobileMenu === 'function') {
+            (window as any).__closeMobileMenu();
+          }
+        }
+      };
+      
+      // Add click handler to document
+      document.addEventListener('click', handleOutsideClick);
+      
       // Check if we're on a mobile device or low-end device using the data attribute
       const isMobileOrLowEnd = 
         document.documentElement.dataset.lowEndDevice === 'true' || 
@@ -23,12 +39,17 @@ export default function MobileCompatFix() {
             (element as HTMLElement).classList.add('skills-mobile-bg');
           }
         });
-        
-        // Fix navbar menu styling
+          // Fix navbar menu styling and touch behavior
         const navbarItems = document.querySelectorAll('.navbar-menu-item');
         navbarItems.forEach(item => {
           if (item) {
             (item as HTMLElement).classList.add('navbar-mobile-menu-item');
+            
+            // Fix touch behavior on mobile
+            item.addEventListener('touchstart', (e) => {
+              // Prevent default touch behavior that might interfere with our custom handling
+              e.stopPropagation();
+            }, { passive: true });
           }
         });
         
@@ -64,10 +85,27 @@ export default function MobileCompatFix() {
     
     // Set up event listeners
     window.addEventListener('resize', applyMobileFixes);
+      // Reference to the outside click handler for cleanup
+    const handleOutsideClick = (e: MouseEvent) => {
+      const mobileMenu = document.querySelector('.navbar-mobile-menu');
+      const mobileMenuButton = document.querySelector('button[aria-label="Toggle menu"]');
+      
+      if (mobileMenu && !mobileMenu.contains(e.target as Node) && 
+          mobileMenuButton && !mobileMenuButton.contains(e.target as Node)) {
+        // Call the close menu function if it exists
+        if (typeof (window as any).__closeMobileMenu === 'function') {
+          (window as any).__closeMobileMenu();
+        }
+      }
+    };
+    
+    // Add document click handler
+    document.addEventListener('click', handleOutsideClick);
     
     // Clean up on unmount
     return () => {
       window.removeEventListener('resize', applyMobileFixes);
+      document.removeEventListener('click', handleOutsideClick);
     };
   }, []);
 

@@ -294,20 +294,23 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
       
       return () => clearTimeout(timeout);
     }
-  }, [easterEggType]);
-  // Clean up any lingering timeouts when component unmounts
+  }, [easterEggType]);  // Clean up any lingering timeouts when component unmounts
   useEffect(() => {
     return () => {
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
       }
-    };
-  }, []);  // Helper function to handle smooth scrolling to sections
+    };  }, []);
+  
+  // Helper function to handle smooth scrolling to sections
   const scrollToSection = useCallback((id: string) => {
     const section = document.getElementById(id);
     if (section) {
       // Set the active section immediately
       setActiveSection(id);
+      
+      // Close mobile menu to prevent UI getting stuck
+      setIsMenuOpen(false);
       
       // Set a scroll lock to prevent the scroll handler from updating active section during animation
       if (scrollLockTimeout.current) {
@@ -370,11 +373,12 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
       }
       
       setIsMenuOpen(false);
-      
-      // Prevent default scroll behavior that might be causing overshooting
+        // Prevent default scroll behavior that might be causing overshooting
       return false;
     }
-  }, []);// Special dedicated function for navigating to contact section
+  }, []);
+  
+  // Special dedicated function for navigating to contact section
   const goToContactSection = useCallback(() => {
     // Use the global function from ContactNavFix if available
     if (typeof (window as any).__goToContact === 'function') {
@@ -432,15 +436,20 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
       }, 100);
     }
   }, [navRef, setActiveSection, setIsMenuOpen]);
-    // Effect to handle body scroll lock when mobile menu is open
+  // Effect to handle body scroll lock when mobile menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    // Apply scroll lock with a slight delay to ensure proper timing
+    const scrollLockId = setTimeout(() => {
+      if (isMenuOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }, 10);
     
+    // Ensure we're cleaning up properly
     return () => {
+      clearTimeout(scrollLockId);
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
@@ -698,8 +707,7 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
         </div>
 
         {/* Mobile Menu - Compact dropdown for small screens */}
-        <AnimatePresence>          {isMenuOpen && (            <motion.div
-              initial={{ opacity: 0, height: 0, y: -5 }}
+        <AnimatePresence>          {isMenuOpen && (            <motion.div              initial={{ opacity: 0, height: 0, y: -5 }}
               animate={{ opacity: 1, height: 'auto', y: 0 }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ 
@@ -707,13 +715,14 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
                 ease: "easeOut"
               }}
               className="lg:hidden overflow-hidden bg-gray-900/95 rounded-2xl mt-2 
-                border border-gray-700 shadow-xl animate-gpu fixed left-4 right-4 z-50 navbar-mobile-menu"
+                border border-gray-700 shadow-xl animate-gpu fixed left-4 right-4 z-[100] navbar-mobile-menu"
               style={{ 
                 willChange: "opacity",
                 backfaceVisibility: 'hidden',
                 transform: 'translateZ(0)',
                 maxHeight: 'calc(100vh - 80px)',
-                overflowY: 'auto'
+                overflowY: 'auto',
+                touchAction: 'pan-y'
               }}
             >
               <div className="px-4 py-3 space-y-2">
@@ -760,33 +769,36 @@ export default function Navbar() {  const [activeSection, setActiveSection] = us
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation(); // Stop event propagation
+                            // Always close mobile menu first to prevent UI getting stuck
+                          setIsMenuOpen(false);
                           
-                          // Handle navigation for different sections
-                          if (item.id === 'contact') {
-                            // Set active section
-                            setActiveSection('contact');
-                            
-                            // Get contact section element
-                            const contactSection = document.getElementById('contact');
-                            if (contactSection) {
-                              // Directly set scroll position without animation
-                              const navHeight = navRef.current ? navRef.current.offsetHeight : 0;
-                              const offset = contactSection.getBoundingClientRect().top + window.scrollY;
+                          // Use setTimeout to ensure menu closes before scrolling
+                          setTimeout(() => {
+                            // Handle navigation for different sections
+                            if (item.id === 'contact') {
+                              // Set active section
+                              setActiveSection('contact');
                               
-                              // Immediately scroll to position
-                              window.scrollTo({
-                                top: offset - navHeight - 32, // Extra buffer
-                                behavior: 'auto' // No animation
-                              });
-                              
-                              // Close mobile menu
-                              setIsMenuOpen(false);
+                              // Get contact section element
+                              const contactSection = document.getElementById('contact');
+                              if (contactSection) {
+                                // Directly set scroll position without animation
+                                const navHeight = navRef.current ? navRef.current.offsetHeight : 0;
+                                const offset = contactSection.getBoundingClientRect().top + window.scrollY;
+                                
+                                // Immediately scroll to position
+                                window.scrollTo({
+                                  top: offset - navHeight - 32, // Extra buffer
+                                  behavior: 'auto' // No animation
+                                });
+                              }
+                            } else {
+                              // Regular sections use standard scrolling
+                              scrollToSection(item.id);
                             }
-                            return false;
-                          }
+                          }, 10);
                           
-                          // Regular sections use standard scrolling
-                          return scrollToSection(item.id);
+                          return false;
                         }}
                         className={`navbar-menu-item flex items-center space-x-3 w-full px-4 py-3 rounded-xl 
                           transition-colors duration-150 active:scale-98 ${

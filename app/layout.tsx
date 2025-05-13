@@ -9,6 +9,7 @@ import NavbarEnhancer from '@/components/NavbarEnhancer'
 import AnimationOptimizer from '@/components/AnimationOptimizer'
 import PerformanceOptimizer from '@/components/PerformanceOptimizer'
 import MobileCompatFix from '@/components/MobileCompatFix'
+import MobileNavFix from '@/components/MobileNavFix'
 import Script from 'next/script'
 
 
@@ -97,6 +98,7 @@ export default function RootLayout({
           {/* Performance optimizers for better animation rendering */}          <AnimationOptimizer />
           <PerformanceOptimizer />
           <MobileCompatFix />
+          <MobileNavFix />
           <Script src="/optimizeAnimations.js" strategy="afterInteractive" />
           <ClientNavbarWrapper />
           <div className="flex flex-col min-h-screen">

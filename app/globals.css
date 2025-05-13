@@ -12,6 +12,8 @@
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    z-index: 100 !important;
   }
   
   /* Fix skills section on mobile */
@@ -31,6 +33,7 @@
     border-radius: 10px;
     margin-bottom: 4px;
     background-color: transparent;
+    touch-action: manipulation;
   }
   
   .navbar-menu-item:hover, .navbar-menu-item.active {
