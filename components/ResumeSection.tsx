@@ -327,11 +327,23 @@ const ResumeSection = () => {
   // Resume Data
   const resumeData = {
     work: [
+       {
+        title: "Data Annotation <i>(Freelance)</i>",
+        organization: "Rekan Remote",
+        period: "Apr 2025 - Present",
+        location: "<i>Remote</i>",
+        description: [
+          "Curated textual datasets by reviewing, correcting grammatical errors, and enhancing syntax to maintain linguistic integrity and coherence across diverse content types.",
+          "Conducted rigorous data confirmation checks to validate accuracy, consistency, and reliability, resolving discrepancies to uphold high-quality standards for downstream usage.",
+          "Systematically processed and organized large volumes of unstructured raw data, ensuring alignment with project specifications through meticulous validation and formatting."
+        ],
+        type: 'work' as const,
+      },
       {
         title: "Administrative Intern",
         organization: "Vriddhi Agency",
         period: "Feb 2025 - Apr 2025",
-        location: "Malang, East Java, Indonesia",
+        location: "Malang, East Java, Indonesia <i>(Remote)</i>",
         description: [
           "Researched 10+ companies daily to update spreadsheets, prioritizing prospects needing web development services",
           "Executed email campaigns using promotional materials to pitch web solutions and conducted daily follow-ups",
@@ -343,7 +355,7 @@ const ResumeSection = () => {
         title: "Co-Facilitator  Intern",
         organization: "BTPN Syariah",
         period: "Oct 2024 - Jan 2025",
-        location: "Pacitan, East Java, Indonesia",
+        location: "Pacitan, East Java, Indonesia <i>(On-Site)</i>",
         description: [
           "Empowered 10+ SMEs via workshops and field mentoring, achieving a 71.3/100 competency score",
           "Trained entrepreneurs in problem-solving, Microsoft Office, and e-learning systems",
@@ -355,7 +367,7 @@ const ResumeSection = () => {
         title: "Digital Marketing Intern",
         organization: "GAOTek Inc",
         period: "Apr 2024 - Aug 2024",
-        location: "New York, USA (Remote)",
+        location: "New York, USA <i>(Remote)</i>",
         description: [
           "Conducted SEO-driven market research, organized data in Excel, and delivered 15+ monthly reports",
           "Collaborated in weekly virtual meetings to align strategies and share insights"
