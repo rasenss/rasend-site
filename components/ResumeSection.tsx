@@ -328,7 +328,7 @@ const ResumeSection = () => {
   const resumeData = {
     work: [
        {
-        title: "Data Annotation <i>(Freelance)</i>",
+        title: "Data Annotation (Freelance)",
         organization: "Rekan Remote",
         period: "Apr 2025 - Present",
         location: "<i>Remote</i>",
@@ -343,7 +343,7 @@ const ResumeSection = () => {
         title: "Administrative Intern",
         organization: "Vriddhi Agency",
         period: "Feb 2025 - Apr 2025",
-        location: "Malang, East Java, Indonesia <i>(Remote)</i>",
+        location: "Malang, East Java, Indonesia (Remote)",
         description: [
           "Researched 10+ companies daily to update spreadsheets, prioritizing prospects needing web development services",
           "Executed email campaigns using promotional materials to pitch web solutions and conducted daily follow-ups",
@@ -355,7 +355,7 @@ const ResumeSection = () => {
         title: "Co-Facilitator  Intern",
         organization: "BTPN Syariah",
         period: "Oct 2024 - Jan 2025",
-        location: "Pacitan, East Java, Indonesia <i>(On-Site)</i>",
+        location: "Pacitan, East Java, Indonesia (On-Site)",
         description: [
           "Empowered 10+ SMEs via workshops and field mentoring, achieving a 71.3/100 competency score",
           "Trained entrepreneurs in problem-solving, Microsoft Office, and e-learning systems",
@@ -367,7 +367,7 @@ const ResumeSection = () => {
         title: "Digital Marketing Intern",
         organization: "GAOTek Inc",
         period: "Apr 2024 - Aug 2024",
-        location: "New York, USA <i>(Remote)</i>",
+        location: "New York, USA (Remote)",
         description: [
           "Conducted SEO-driven market research, organized data in Excel, and delivered 15+ monthly reports",
           "Collaborated in weekly virtual meetings to align strategies and share insights"
